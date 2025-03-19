@@ -54,12 +54,12 @@ serve(async (req: Request) => {
 
     // Handle DELETE request - edit message
     if (req.method === "DELETE") {
-      const toDos = await req.json();
+      const { id } = await req.json();
 
       const { error } = await supabase
           .from("todos")
           .delete()
-          .eq("id", "4");
+          .eq("id", id);
 
       if (error) throw error;
       return new Response(
