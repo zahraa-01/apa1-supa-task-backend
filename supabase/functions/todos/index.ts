@@ -37,11 +37,11 @@ serve(async (req: Request) => {
 
     // Handle PUT request - edit message
     if (req.method === "PUT") {
-      const { id, toDo } = await req.json();
+      const { id, todo } = await req.json();
 
       const { data, error } = await supabase
           .from("todos")
-          .update({ toDo })
+          .update({ todo })
           .eq("id", id)
           .select();
 
