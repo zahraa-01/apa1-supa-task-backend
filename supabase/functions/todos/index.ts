@@ -37,6 +37,8 @@ serve(async (req: Request) => {
 
     // Handle PUT request - edit message
     if (req.method === "PUT") {
+      //const body = await req.json();
+      //console.log("Request body:", body);
       const { id, todo } = await req.json();
 
       const { data, error } = await supabase
@@ -46,8 +48,9 @@ serve(async (req: Request) => {
           .select();
 
       if (error) throw error;
+      console.log("Updated Todo Data:", data);
       return new Response(
-          JSON.stringify({ success: true, message: `To-Do updated! ${data}` }),
+          JSON.stringify({ success: true, message: "To-Do updated!", todo }),
           { headers }
       );
     }
