@@ -40,15 +40,21 @@ serve(async (req: Request) => {
 
     if (req.method === "PUT") {
       const body = await req.json();
-      const {id, ...updates} = body;
+      const { id, ...updates } = body;
 
-      if (!id) {
-        return new Response(JSON.stringify({error: "Missing ID for update"}), {status: 400, headers});
+      if (updates.priority) {
+        updates.priority = updates.priority.toLowerCase();
       }
 
-      const {data, error} = await supabase.from("todos").update(updates).eq("id", id).select();
+      // console.log("Updating with data:", updates);
+
+      if (!id) {
+        return new Response(JSON.stringify({ error: "Missing ID for update" }), { status: 400, headers });
+      }
+
+      const { data, error } = await supabase.from("todos").update(updates).eq("id", id).select();
       if (error) throw error;
-      return new Response(JSON.stringify(data), {headers});
+      return new Response(JSON.stringify(data), { headers });
     }
 
     if (req.method === "DELETE") {
