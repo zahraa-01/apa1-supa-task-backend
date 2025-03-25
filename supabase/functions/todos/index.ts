@@ -8,80 +8,72 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 serve(async (req: Request) => {
   // Simple content-type header is all we need
-  const headers = { "Content-Type": "application/json" };
+  const headers = {"Content-Type": "application/json"};
+  const url = new URL(req.url);
+  const priority = url.searchParams.get("priority");
 
   try {
-    // Handle GET request - fetch todos
     if (req.method === "GET") {
-      const { data, error } = await supabase
-          .from("todos")
-          .select("*")
-          .order("created_at", { ascending: false });
+      let query = supabase.from("todos").select("*").order("created_at", {ascending: false});
 
+      if (priority) {
+        query = query.eq("priority", priority);
+      }
+
+      const {data, error} = await query;
       if (error) throw error;
-      return new Response(JSON.stringify(data), { headers });
+      return new Response(JSON.stringify(data), {headers});
     }
 
-    // Handle POST request - add message
     if (req.method === "POST") {
-      const { todo } = await req.json();
-      console.log("<---- checking to do", todo);
-      const { error } = await supabase.from("todos").insert([{ todo }]);
-
-      if (error) throw error;
-      return new Response(
-          JSON.stringify({ success: true, message: "To-Do created!" }),
-          { headers }
-      );
-    }
-
-    // Handle PUT request - edit message
-    if (req.method === "PUT") {
-      //const body = await req.json();
-      //console.log("Request body:", body);
-      const { id, todo } = await req.json();
+      const body = await req.json();
+      const { todo, priority = "low" } = body;
 
       const { data, error } = await supabase
           .from("todos")
-          .update({ todo })
-          .eq("id", id)
+          .insert([{ todo, priority }])
           .select();
 
       if (error) throw error;
-      console.log("Updated Todo Data:", data);
-      return new Response(
-          JSON.stringify({ success: true, message: "To-Do updated!", todo }),
-          { headers }
-      );
+      return new Response(JSON.stringify(data), { headers, status: 201 });
     }
 
-    // Handle DELETE request - edit message
-    if (req.method === "DELETE") {
-      const { id } = await req.json();
+    if (req.method === "PUT") {
+      const body = await req.json();
+      const {id, ...updates} = body;
 
-      const { error } = await supabase
-          .from("todos")
-          .delete()
-          .eq("id", id);
+      if (!id) {
+        return new Response(JSON.stringify({error: "Missing ID for update"}), {status: 400, headers});
+      }
 
+      const {data, error} = await supabase.from("todos").update(updates).eq("id", id).select();
       if (error) throw error;
-      return new Response(
-          JSON.stringify({ success: true, message: `To-Do deleted!` }),
-          { headers }
-      );
+      return new Response(JSON.stringify(data), {headers});
     }
 
-    // Handle unsupported methods
-    return new Response(JSON.stringify({ error: "Method not allowed" }), {
+    if (req.method === "DELETE") {
+      const body = await req.json();
+      const {id} = body;
+
+      if (!id) {
+        return new Response(JSON.stringify({error: "Missing ID for deletion"}), {status: 400, headers});
+      }
+
+      const {error} = await supabase.from("todos").delete().eq("id", id);
+      if (error) throw error;
+      return new Response(JSON.stringify({message: "Deleted successfully"}), {headers});
+    }
+
+    return new Response(JSON.stringify({error: "Method not allowed"}), {
       status: 405,
       headers,
     });
   } catch (error) {
     const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({error: errorMessage}), {
       status: 500,
       headers,
-    });
+    })
   }
 });
