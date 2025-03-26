@@ -110,6 +110,8 @@ We conducted manual testing of the endpoints using [Hoppscotch](https://hoppscot
 - Update a Todo: Expect a 200 status code with the updated todo object.
 - Delete a Todo: Expect a 204 status code indicating successful deletion.
 
+We have some screenshot examples of expected responses, errors and anything you may come across in Hoppscotch or Supabase for logs and invocations too in the screenshots folder for reference of the happy path or how we debugged.
+
 ## Debugging and Troubleshooting
 
 To assist with debugging, you can add console logs throughout your Edge Functions. These logs will be visible in the Supabase Dashboard and can help identify issues during execution.
