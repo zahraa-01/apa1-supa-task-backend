@@ -46,8 +46,6 @@ serve(async (req: Request) => {
         updates.priority = updates.priority.toLowerCase();
       }
 
-      // console.log("Updating with data:", updates);
-
       if (!id) {
         return new Response(JSON.stringify({ error: "Missing ID for update" }), { status: 400, headers });
       }
