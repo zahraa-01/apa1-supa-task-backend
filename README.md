@@ -298,6 +298,6 @@ The Invocations feature in Supabase Edge Functions provides several benefits for
 - Error Handling: The implementation includes comprehensive error handling to manage unexpected scenarios gracefully.
 - Security: The API follows best practices for securing endpoints, including input validation.
 
-**Conclusion**
+## Conclusion
 
 This backend provides a robust foundation for managing tasks in the APA1 Supa Task application. It offers CRUD operations for todos with priority filtering capabilities. By following the guidelines and utilizing the debugging techniques provided, you can effectively develop and troubleshoot your backend services.
